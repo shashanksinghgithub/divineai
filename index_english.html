@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"> 
+<title>Lord Krishna AI</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+
+    background:
+    linear-gradient(
+        135deg,
+        #0f766e 0%,
+        #2563eb 50%,
+        #7c3aed 100%
+    );
+
+    text-align:center;
+    padding:20px;
+}
+
+body{
+    font-family: Arial, sans-serif;
+    overflow-x:hidden;
+
+    background:
+    linear-gradient(
+        135deg,
+        #0f766e 0%,
+        #2563eb 50%,
+        #7c3aed 100%
+    );
+
+    text-align:center;
+    padding:20px;
+
+    position:relative;
+}
+
+.clouds{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:-1;
+    overflow:hidden;
+}
+
+.cloud{
+    position:absolute;
+    background:rgba(255,255,255,0.5);
+    border-radius:100px;
+
+    width:250px;
+    height:80px;
+
+    filter:blur(3px);
+}
+
+.cloud:before,
+.cloud:after{
+    content:"";
+    position:absolute;
+    background:rgba(255,255,255,0.5);
+    border-radius:50%;
+}
+
+.cloud:before{
+    width:100px;
+    height:100px;
+    top:-50px;
+    left:30px;
+}
+
+.cloud:after{
+    width:120px;
+    height:120px;
+    top:-60px;
+    right:30px;
+}
+
+.cloud1{
+    top:10%;
+    animation:moveClouds 60s linear infinite;
+}
+
+.cloud2{
+    top:35%;
+    animation:moveClouds 90s linear infinite;
+}
+
+.cloud3{
+    top:65%;
+    animation:moveClouds 75s linear infinite;
+}
+
+@keyframes moveClouds{
+    from{
+        transform:translateX(-350px);
+    }
+
+    to{
+        transform:translateX(calc(100vw + 350px));
+    }
+}
+
+.top-bar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:15px;          /* Krishna aur Auto Detect ke beech ka gap */
+    margin-bottom:5px;
+    flex-wrap:wrap;
+}
+
+.top-bar h1{
+    margin:0;
+    margin-right:260px; /* Divine AI aur Krishna ke beech gap */
+}
+
+h1{
+    color:white;
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.5),
+        0 0 20px rgba(255,255,255,0.3);
+}
+
+#video-container{
+    width:800px;
+    margin:auto;
+
+    border-radius:25px;
+
+    box-shadow:
+        0 0 40px rgba(255,215,0,0.4),
+        0 0 80px rgba(255,215,0,0.2);
+}
+
+select{
+    padding:10px;
+    border-radius:12px;
+    border:none;
+    font-size:18px;
+
+    background:white;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.2);
+}
+
+.container{
+    width:95%;
+    margin:auto;
+}
+
+#video-container{
+    width:800px;
+    margin:auto;
+}
+
+video{
+    width:800px;
+    height:auto;
+    border-radius:20px;
+    box-shadow:0px 0px 20px rgba(0,0,0,0.2);
+
+    transition: opacity 0.3s ease;
+}
+
+#answerBox{
+    width:800px;
+    margin:20px auto;
+    background:white;
+    min-height:100px;
+    max-height:250px;
+    overflow-y:auto;
+    border:1px solid #ccc;
+    border-radius:10px;
+    padding:15px;
+    text-align:left;
+}
+
+
+input{
+    width:70%;
+    padding:15px;
+    margin-top:15px;
+    font-size:16px;
+}
+
+button{
+    padding:15px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+
+<div class="clouds">
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="cloud cloud3"></div>
+</div>
+
+<div class="container">
+
+<div class="top-bar">
+
+    <h1>🦚 Divine AI</h1>
+
+    <select id="guruSelect">
+        <option value="krishna">🦚 Krishna</option>
+        <option value="jesus">✝️ Jesus</option>
+    </select>
+
+    <select id="languageSelect">
+        <option value="auto">🌎 Auto Detect</option>
+        <option value="hindi">🇮🇳 Hindi</option>
+        <option value="english">🇬🇧 English</option>
+    </select>
+
+</div>
+
+<br>
+
+<div id="video-container">
+
+    <video
+        id="listeningVideo"
+        autoplay
+        loop
+        playsinline>
+
+
+        <source src="listening.mp4" type="video/mp4">
+
+    </video>
+
+    <video
+        id="speakingVideo"
+        autoplay
+        loop
+        playsinline
+        style="display:none;">
+
+        <source src="speaking.mp4" type="video/mp4">
+
+    </video>
+
+</div>
+
+<br>
+
+<input
+    id="question"
+    placeholder="What's on your mind?"
+>
+
+<button onclick="askKrishna()" title="Send">
+➤
+</button>
+
+<button onclick="startListening()">
+🎤
+</button>
+
+<div id="answerBox">
+    नमस्ते वत्स। अपना प्रश्न पूछिए।
+</div>
+
+</div>
+
+<script>
+
+const API_URL =
+"http://127.0.0.1:8000";
+
+const answerBox = document.getElementById("answerBox");
+
+const listeningVideo =
+document.getElementById("listeningVideo");
+
+const speakingVideo =
+document.getElementById("speakingVideo");
+
+// Preload voices
+window.speechSynthesis.getVoices();
+
+window.speechSynthesis.onvoiceschanged = () => {
+    window.speechSynthesis.getVoices();
+};
+
+function showListening(){
+    console.log("Switching to listening");
+
+    const guru =
+    document.getElementById("guruSelect").value;
+
+    const targetVideo =
+        guru === "jesus"
+        ? "Listening J.mp4"
+        : "listening.mp4";
+
+    if(!listeningVideo.src.includes(targetVideo)){
+        listeningVideo.querySelector("source").src = targetVideo;
+        listeningVideo.load();
+    }
+    speakingVideo.style.opacity = "0";
+
+    setTimeout(() => {
+        speakingVideo.style.display = "none";
+        listeningVideo.style.display = "block";
+        listeningVideo.style.opacity = "1";
+    }, 150);
+}
+
+function showSpeaking(){
+
+    console.log("Switching to speaking");
+
+    const guru =
+    document.getElementById("guruSelect").value;
+
+    const targetVideo =
+        guru === "jesus"
+        ? "Speaking J.mp4"
+        : "speaking.mp4";
+
+    if(!speakingVideo.src.includes(targetVideo)){
+        speakingVideo.querySelector("source").src = targetVideo;
+        speakingVideo.load();
+    }
+
+    listeningVideo.style.opacity = "0";
+
+    setTimeout(() => {
+        listeningVideo.style.display = "none";
+        speakingVideo.style.display = "block";
+        speakingVideo.style.opacity = "1";
+    }, 150);
+}
+
+async function askKrishna(){
+
+    const question =
+    document.getElementById("question").value;
+
+    const guru =
+    document.getElementById("guruSelect").value;
+
+    const language =
+    document.getElementById("languageSelect").value;
+
+    if(question.trim()===""){
+        return;
+    }
+
+
+    document.getElementById("question").value = "";
+
+    try{
+
+        const response =
+        await fetch(
+            API_URL +
+            "/stream_krishna?user_prompt=" +
+            encodeURIComponent(question) +
+            "&language=" +
+            encodeURIComponent(language) +
+            "&guru=" +
+            encodeURIComponent(guru)
+        );
+
+    
+        const answer =
+        await response.text();
+
+        const guruName =
+        guru === "jesus"
+        ? "Jesus"
+        : "Krishna";
+
+        answerBox.innerHTML =
+        "<b>" + guruName + ":</b><br><br>" + answer;
+
+        const krishnaText =
+        answer
+        .replace(/,/g,", ... ")
+        .replace(/\./g,". ... ");
+
+        speak(krishnaText);
+
+
+    }
+    catch(err){
+
+        console.log(err);
+
+        answerBox.innerHTML =
+        "<b>त्रुटि:</b> सर्वर से संपर्क नहीं हो पाया।";
+
+    }
+}
+
+function speak(text){
+
+    window.speechSynthesis.cancel();
+
+    const speech =
+    new SpeechSynthesisUtterance(text);
+
+    const language =
+    document.getElementById("languageSelect").value;
+
+    if(/[ऀ-ॿ]/.test(text)){
+        speech.lang = "hi-IN";
+    }
+    else{
+        speech.lang = "en-US";
+    }
+
+    speech.rate = 0.9;
+
+    speech.pitch = 1;
+
+    const voices =
+    window.speechSynthesis.getVoices();
+
+    const bestVoice =
+        voices.find(v => v.name === "Google हिन्दी")
+        || voices.find(v => v.name === "Google UK English Male")
+        || voices[0];
+
+    speech.voice = bestVoice;
+
+    console.log("Using Voice:", bestVoice.name);
+
+    speech.onstart = function(){
+
+        showSpeaking();
+
+    };
+
+    speech.onend = function(){
+
+        showListening();
+
+    };
+
+    window.speechSynthesis.speak(speech);
+
+}
+
+
+document.getElementById("question")
+.addEventListener("keypress", function(e){
+
+    if(e.key === "Enter"){
+        askKrishna();
+    }
+
+});
+function startListening(){
+
+    //showListening();
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+
+        alert("Please use Chrome");
+
+        return;
+    }
+
+    const recognition =
+    new SpeechRecognition();
+
+    const language =
+    document.getElementById("languageSelect").value;
+
+    if(language === "english"){
+        recognition.lang = "en-US";
+    }
+    else if(language === "hindi"){
+        recognition.lang = "hi-IN";
+    }
+    else{
+        recognition.lang = "en-IN";
+    }
+
+    recognition.start();
+
+    recognition.onresult =
+    function(event){
+
+        const text =
+        event.results[0][0].transcript;
+
+        console.log("Recognized:", text);
+
+        document.getElementById("question").value =
+        text;
+
+        askKrishna();
+
+    };
+
+}
+
+document.getElementById("guruSelect")
+.addEventListener("change", function(){
+
+    showListening();
+
+});
+
+showListening();
+
+</script>
+
+</body>
+</html>
