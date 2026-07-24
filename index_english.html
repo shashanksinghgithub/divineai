@@ -291,9 +291,11 @@ button{
 
     video{
         width:100%;
-        border-radius:15px;
+        height:auto;
+        min-height:280px;
+        object-fit:cover;
+        border-radius:18px;
     }
-
     .input-container{
         width:100%;
         max-width:100%;
@@ -392,11 +394,15 @@ button{
     >
 
     <div class="button-row">
-
+    
         <button class="action-btn" onclick="askKrishna()" title="Send">
             ➤
         </button>
-
+    
+        <button class="action-btn" onclick="startListening()" title="Speak">
+            🎤
+        </button>
+    
     </div>
 
 </div>
