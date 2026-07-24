@@ -259,14 +259,26 @@ button{
 
 <br>
 
-<input
-    id="question"
-    placeholder="What's on your mind?"
->
+<div class="input-container">
 
-<button onclick="askKrishna()" title="Send">
-➤
-</button>
+    <input
+        id="question"
+        placeholder="What's on your mind?"
+    >
+
+    <div class="button-row">
+
+        <button class="action-btn" onclick="askKrishna()" title="Send">
+            ➤
+        </button>
+
+        <button class="action-btn" onclick="startListening()" title="Speak">
+            🎤
+        </button>
+
+    </div>
+
+</div>
 
 <button onclick="startListening()">
 🎤
