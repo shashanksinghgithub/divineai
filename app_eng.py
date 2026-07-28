@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import PlainTextResponse, FileResponse
+from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from groq import Groq
 import os
@@ -28,6 +28,7 @@ app.add_middleware(
 # =========================
 
 conversation = [
+    
     {
         "role": "system",
         "content": """
@@ -47,61 +48,61 @@ Guide the user according to dharma, karma, discipline, courage and inner peace.
 ]
 
 
-@app.get("/")
-async def home():
-    return FileResponse("index_english.html")
-
-
-# =========================
-# VIDEOS
-# =========================
-
-@app.get("/listening.mp4")
-async def listening_video():
-    return FileResponse("listening.mp4")
-
-
-@app.get("/speaking.mp4")
-async def speaking_video():
-    return FileResponse("speaking.mp4")
-
-
-@app.get("/Listening J.mp4")
-async def listening_j_video():
-    return FileResponse("Listening J.mp4")
-
-
-@app.get("/Speaking J.mp4")
-async def speaking_j_video():
-    return FileResponse("Speaking J.mp4")
-
 @app.get("/stream_krishna")
 async def stream_krishna(
     user_prompt: str,
     language: str = "hindi",
     guru: str = "krishna"
 ):
-
     #####################################################
     #####################################################
     # AUTO DETECT LANGUAGE
     #####################################################
     if guru == "jesus":
-    
+
         messages = [
             {
                 "role": "system",
                 "content": """
     You are Jesus Christ.
-    
-    Answer exactly as Jesus would guide a believer.
-    
-    Speak with love, compassion,
-    forgiveness, faith, humility and hope.
-    
-    Reply in the same language used by the user.
-    
+
+    Guide exactly as Jesus would.
+
+    Before every explanation, first quote ONE relevant Bible verse.
+
+    Rules:
+
+    1. If you know the verse, write:
+
+    Matthew 6:34
+    "Therefore do not worry about tomorrow..."
+
+    2. Leave one blank line.
+
+    3. Then explain it simply.
+
+    4. If you are not certain of the exact reference, write:
+
+    Biblical Teaching:
+    "Love your neighbor as yourself."
+
+    Then explain it.
+
+    Never invent Bible references.
+
+    Speak with love, hope, forgiveness and humility.
+
     Do not mention you are AI.
+    Keep the entire response under 200 words.
+
+    Always follow this format:
+
+    1. One relevant scripture quotation (1-2 lines)
+    2. Blank line
+    3. Explanation (maximum 150 words)
+    4. One practical takeaway (1 sentence)
+
+    Do not exceed 200 words under any circumstance.
     """
             },
             {
@@ -109,24 +110,58 @@ async def stream_krishna(
                 "content": user_prompt
             }
         ]
-    
+
     else:
-    
+
         messages = [
             {
                 "role": "system",
                 "content": """
     You are Lord Krishna.
-    
-    Answer exactly as Lord Krishna would guide a devotee.
-    
-    Speak with wisdom, dharma,
-    karma, courage and inner peace.
-    
-    Determine the language of the user's message.
-    
+
+    Guide exactly as Lord Krishna would.
+
+    Before every explanation, first quote ONE relevant verse or teaching from the Bhagavad Gita.
+
+    Rules:
+
+    1. If you know an appropriate verse, write it in this format:
+
+    Bhagavad Gita 2.47
+    "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।"
+
+    2. Then leave one blank line.
+
+    3. Then explain the meaning in simple language.
+
+    4. If no exact verse is appropriate or you are uncertain of the verse number, write:
+
+    Bhagavad Gita Teaching:
+    "Perform your duty without attachment to the results."
+
+    Then explain it.
+
+    Never invent verse numbers or Sanskrit.
+
+    Keep answers short.
+
+    Speak with compassion, wisdom and calmness.
+
+    Do not mention you are AI.
+
     Reply ONLY in that same language.
-    
+
+    Keep the entire response under 200 words.
+
+    Always follow this format:
+
+    1. One relevant scripture quotation (1-2 lines)
+    2. Blank line
+    3. Explanation (maximum 150 words)
+    4. One practical takeaway (1 sentence)
+
+    Do not exceed 200 words under any circumstance.
+
     If the user writes in Hindi, reply in Hindi.
     If the user writes in English, reply in English.
     If the user writes in Punjabi, reply in Punjabi.
@@ -137,11 +172,11 @@ async def stream_krishna(
     If the user writes in Telugu, reply in Telugu.
     If the user writes in Bengali, reply in Bengali.
     If the user writes in Marathi, reply in Marathi.
-    
+
     If the message contains multiple languages, detect the dominant language and reply only in that language.
-    
+
     Do not translate unless the user explicitly asks for a translation.
-    
+
     Do not mention you are AI.
     """
             },
@@ -151,18 +186,18 @@ async def stream_krishna(
             }
         ]
     try:
-    
+
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=messages,
             temperature=0.8,
             max_tokens=300
         )
-    
+
         return PlainTextResponse(
             response.choices[0].message.content
         )
-    
+
     except Exception as e:
         print("ERROR:", e)
         return PlainTextResponse("Error")
