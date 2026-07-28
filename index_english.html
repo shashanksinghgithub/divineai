@@ -40,17 +40,6 @@ body{
     position:relative;
 }
 
-.clouds{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    pointer-events:none;
-    z-index:-1;
-    overflow:hidden;
-}
-
 .cloud{
     position:absolute;
     background:rgba(255,255,255,0.5);
@@ -193,7 +182,6 @@ video{
     text-align:left;
 }
 
-
 input{
     width:70%;
     padding:15px;
@@ -206,7 +194,6 @@ button{
     font-size:16px;
     cursor:pointer;
 }
-
 
 
 .input-container{
@@ -252,6 +239,110 @@ button{
     transform:scale(1.05);
 }
 
+/* Mic wrapper */
+.mic-wrapper{
+    position:relative;
+    display:inline-block;
+}
+
+/* Speak Hint */
+.hint{
+    position:absolute;
+    right:-110px;
+    top:-15px;
+
+    background:#FFF8B0;
+    border:4px solid #FFD700;
+    border-radius:18px;
+
+    padding:12px 18px;
+
+    font-size:18px;
+    font-style:italic;
+    font-family:Georgia, serif;
+
+    color:#000;
+    animation:hintBounce 1.2s infinite;
+    z-index:1000;
+}
+
+/* Arrow */
+.hint::after{
+    content:"";
+    position:absolute;
+    left:-15px;
+    top:55%;
+    width:18px;
+    height:4px;
+    background:#FFD700;
+    transform:rotate(-25deg);
+}
+
+@keyframes hintBounce{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-8px); }
+}
+
+/* ---------- ADD THE POPUP CSS HERE ---------- */
+
+.popup-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.popup-box{
+    width:90%;
+    max-width:420px;
+    background:white;
+    border-radius:18px;
+    padding:30px;
+    text-align:center;
+    animation:popup .35s ease;
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+
+.popup-box h2{
+    margin-top:0;
+    color:#2563eb;
+}
+
+.popup-box p{
+    font-size:18px;
+    line-height:1.6;
+}
+
+.popup-box button{
+    margin-top:20px;
+    padding:12px 30px;
+    border:none;
+    border-radius:12px;
+    background:#2563eb;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+@keyframes popup{
+    from{
+        opacity:0;
+        transform:scale(.8);
+    }
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.action-btn.glow{
+    background:#FFD700;
+    color:#000;
+    box-shadow:0 0 20px #FFD700;
+}
 
 /* ================= MOBILE ================= */
 
@@ -291,11 +382,9 @@ button{
 
     video{
         width:100%;
-        height:auto;
-        min-height:280px;
-        object-fit:cover;
-        border-radius:18px;
+        border-radius:15px;
     }
+
     .input-container{
         width:100%;
         max-width:100%;
@@ -317,6 +406,7 @@ button{
         font-size:24px;
     }
 
+
     #answerBox{
         width:100%;
         font-size:16px;
@@ -330,6 +420,27 @@ button{
 
 <body>
 
+<div id="welcomePopup" class="popup-overlay">
+    <div class="popup-box">
+        <h2>🦚 Welcome to Divine AI</h2>
+
+        <p>
+            Click the <b>Speak</b> button below.
+        </p>
+
+        <p>
+            🎙️ Wait until it glows, then ask your question naturally.
+        </p>
+
+        <button onclick="closePopup()">Start</button>
+    </div>
+</div>
+
+<div class="clouds">
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="cloud cloud3"></div>
+</div>
 
 <div class="clouds">
     <div class="cloud cloud1"></div>
@@ -366,7 +477,6 @@ button{
         loop
         playsinline>
 
-
         <source src="listening.mp4" type="video/mp4">
 
     </video>
@@ -394,15 +504,20 @@ button{
     >
 
     <div class="button-row">
-    
+
         <button class="action-btn" onclick="askKrishna()" title="Send">
             ➤
         </button>
-    
-        <button class="action-btn" onclick="startListening()" title="Speak">
-            🎤
+
+        <button id="micBtn" class="action-btn" onclick="startListening()" title="Speak">
+            🎙️
         </button>
-    
+
+        <!-- Add this here -->
+        <div id="speakHint" class="hint">
+            Click to<br><b>Speak</b>
+        </div>
+
     </div>
 
 </div>
@@ -415,7 +530,8 @@ button{
 
 <script>
 
-const API_URL ="";
+const API_URL =
+"http://127.0.0.1:8000";
 
 const answerBox = document.getElementById("answerBox");
 
@@ -447,13 +563,16 @@ function showListening(){
         listeningVideo.querySelector("source").src = targetVideo;
         listeningVideo.load();
     }
+
+    listeningVideo.currentTime = 0;
+    listeningVideo.play();
     speakingVideo.style.opacity = "0";
 
     setTimeout(() => {
         speakingVideo.style.display = "none";
         listeningVideo.style.display = "block";
         listeningVideo.style.opacity = "1";
-    }, 150);
+    }, 30);
 }
 
 function showSpeaking(){
@@ -473,13 +592,16 @@ function showSpeaking(){
         speakingVideo.load();
     }
 
+    speakingVideo.currentTime = 0;
+    speakingVideo.play();
+
     listeningVideo.style.opacity = "0";
 
     setTimeout(() => {
         listeningVideo.style.display = "none";
         speakingVideo.style.display = "block";
         speakingVideo.style.opacity = "1";
-    }, 150);
+    }, 30);
 }
 
 async function askKrishna(){
@@ -497,9 +619,10 @@ async function askKrishna(){
         return;
     }
 
-
     document.getElementById("question").value = "";
-
+    if(recognition){
+        recognition.stop();
+    }
     try{
 
         const response =
@@ -531,7 +654,6 @@ async function askKrishna(){
         .replace(/\./g,". ... ");
 
         speak(krishnaText);
-
 
     }
     catch(err){
@@ -579,20 +701,35 @@ function speak(text){
 
     speech.onstart = function(){
 
+        document.getElementById("micBtn").classList.remove("glow");
+
+        speaking = true;
+
         showSpeaking();
 
     };
 
     speech.onend = function(){
 
+        speaking = false;
+
         showListening();
+
+        if(listening){
+            setTimeout(function(){
+
+                recognition.start();
+
+                document.getElementById("micBtn").classList.add("glow");
+
+            },500);
+        }
 
     };
 
     window.speechSynthesis.speak(speech);
 
 }
-
 
 document.getElementById("question")
 .addEventListener("keypress", function(e){
@@ -602,26 +739,36 @@ document.getElementById("question")
     }
 
 });
+
+let recognition = null;
+let listening = false;
+let speaking = false;
 function startListening(){
 
-    //showListening();
 
     const SpeechRecognition =
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
 
     if(!SpeechRecognition){
-
         alert("Please use Chrome");
-
         return;
     }
 
-    const recognition =
-    new SpeechRecognition();
+    if(listening){
+        recognition.stop();
+        listening = false;
+        document.getElementById("micBtn").classList.remove("glow");
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+
+    recognition.continuous = true;
+    recognition.interimResults = false;
 
     const language =
-    document.getElementById("languageSelect").value;
+        document.getElementById("languageSelect").value;
 
     if(language === "english"){
         recognition.lang = "en-US";
@@ -634,22 +781,36 @@ function startListening(){
     }
 
     recognition.start();
+    
+    document.getElementById("micBtn").classList.add("glow");
 
-    recognition.onresult =
-    function(event){
+    listening = true;
+
+
+    recognition.onresult = function(event){
 
         const text =
-        event.results[0][0].transcript;
+            event.results[event.results.length-1][0].transcript;
 
-        console.log("Recognized:", text);
-
-        document.getElementById("question").value =
-        text;
+        document.getElementById("question").value = text;
 
         askKrishna();
 
     };
 
+    recognition.onend = function(){
+
+        if(listening && !speaking){
+
+            setTimeout(function(){
+
+                recognition.start();
+
+            },300);
+
+        }
+
+    };
 }
 
 document.getElementById("guruSelect")
@@ -659,9 +820,14 @@ document.getElementById("guruSelect")
 
 });
 
+function closePopup(){
+    document.getElementById("welcomePopup").style.display = "none";
+}
+
 showListening();
 
 </script>
 
 </body>
 </html>
+
