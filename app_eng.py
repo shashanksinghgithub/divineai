@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from groq import Groq
 import os
@@ -47,6 +47,9 @@ Guide the user according to dharma, karma, discipline, courage and inner peace.
     }
 ]
 
+@app.get("/")
+async def home():
+    return FileResponse("index_english.html")
 
 @app.get("/stream_krishna")
 async def stream_krishna(
