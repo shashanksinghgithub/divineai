@@ -1,20 +1,17 @@
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from groq import Groq
 import os
-import re
-# =========================
-# CONFIG
-# =========================
+
+app = FastAPI()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-
 client = Groq(api_key=GROQ_API_KEY)
 
-from fastapi.responses import FileResponse
+@app.get("/")
+async def home():
+    return FileResponse("index_english.html")
 
 @app.get("/listening.mp4")
 async def listening():
