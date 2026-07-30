@@ -9,12 +9,26 @@ app = FastAPI()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=GROQ_API_KEY)
 
+app = FastAPI()
+
 @app.get("/")
 async def home():
     return FileResponse("index_english.html")
 
 @app.get("/listening.mp4")
 async def listening():
+    import os
+
+    print("Current directory:", os.getcwd())
+    print("Files:", os.listdir("."))
+
+    if not os.path.exists("listening.mp4"):
+        return {
+            "error": "Video not found",
+            "cwd": os.getcwd(),
+            "files": os.listdir(".")
+        }
+
     return FileResponse("listening.mp4", media_type="video/mp4")
 
 @app.get("/speaking.mp4")
@@ -28,8 +42,6 @@ async def listening_j():
 @app.get("/Speaking J.mp4")
 async def speaking_j():
     return FileResponse("Speaking J.mp4", media_type="video/mp4")
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
