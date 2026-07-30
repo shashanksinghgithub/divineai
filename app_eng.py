@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from groq import Groq
 import os
 import re
@@ -13,7 +14,25 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 client = Groq(api_key=GROQ_API_KEY)
 
-app = FastAPI()
+from fastapi.responses import FileResponse
+
+@app.get("/listening.mp4")
+async def listening():
+    return FileResponse("listening.mp4", media_type="video/mp4")
+
+@app.get("/speaking.mp4")
+async def speaking():
+    return FileResponse("speaking.mp4", media_type="video/mp4")
+
+@app.get("/Listening J.mp4")
+async def listening_j():
+    return FileResponse("Listening J.mp4", media_type="video/mp4")
+
+@app.get("/Speaking J.mp4")
+async def speaking_j():
+    return FileResponse("Speaking J.mp4", media_type="video/mp4")
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
