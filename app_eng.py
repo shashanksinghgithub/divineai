@@ -3,6 +3,8 @@ from fastapi.responses import PlainTextResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from groq import Groq
 import os
+import os
+
 
 app = FastAPI()
 
